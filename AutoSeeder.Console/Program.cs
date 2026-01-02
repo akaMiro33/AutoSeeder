@@ -3,8 +3,9 @@
 //string tableSchema = "CREATE TABLE Persons (\r\n    PersonID int,\r\n    LastName varchar(255),\r\n    FirstName varchar(255),\r\n    Address varchar(255),\r\n    City varchar(255)\r\n);";
 using AutoSeeder.Data.Common.DataTypeFactory;
 using AutoSeeder.Services;
-using AutoSeeder.Services.ConstraintParsing;
-using AutoSeeder.Services.ConstraintParsing.Interfaces;
+using AutoSeeder.Services.Common.ConstraintParsing;
+using AutoSeeder.Services.Parser;
+using AutoSeeder.Services.Seed;
 using System;
 
 //string inputTableSchema = "CREATE TABLE Persons (\r\n    PersonID DECIMAL(19,4)  NOT NULL,\r\n    LastName varchar(255)  NOT NULL ,\r\n    FirstName varchar(255)  ,\r\n    Address varchar(255),\r\n    City varchar(255)\r\n);  CREATE TABLE Cars (\r\n    CarID int,\r\n    Type varchar(255),\r\n    Color varchar(255),\r\n    Year varchar(255),\r\n    Country varchar(255)\r\n);";

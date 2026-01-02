@@ -2,8 +2,7 @@
 using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Enums;
 using AutoSeeder.Data.Models;
-using AutoSeeder.Services.ConstraintParsing;
-using AutoSeeder.Services.ConstraintParsing.Interfaces;
+using AutoSeeder.Services.Common.ConstraintParsing;
 using AutoSeeder.Services.Datatypes;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace AutoSeeder.Services
+namespace AutoSeeder.Services.Parser
 {
     public sealed class ParserContext
     {

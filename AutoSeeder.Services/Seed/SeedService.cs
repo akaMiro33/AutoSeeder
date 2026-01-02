@@ -2,7 +2,7 @@
 using Microsoft.VisualBasic;
 using System;
 
-namespace AutoSeeder.Services
+namespace AutoSeeder.Services.Seed
 {
     public class SeedService
     {

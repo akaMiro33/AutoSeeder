@@ -1,7 +1,7 @@
 ﻿using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Models;
-using AutoSeeder.Services;
 using AutoSeeder.Services.Datatypes;
+using AutoSeeder.Services.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoSeeder.Services
+namespace AutoSeeder.Services.Parser
 {
     public sealed class TokenStream
     {
@@ -27,8 +27,8 @@ namespace AutoSeeder.Services
 
             if (token is null ||
                 token.Type != type ||
-                (value != null &&
-                 !token.Value.Equals(value, StringComparison.OrdinalIgnoreCase)))
+                value != null &&
+                 !token.Value.Equals(value, StringComparison.OrdinalIgnoreCase))
             {
                 throw new Exception(
                     $"Expected {type} {value}, got {token?.Value}");
