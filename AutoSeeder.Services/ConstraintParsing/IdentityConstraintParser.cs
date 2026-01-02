@@ -14,14 +14,15 @@ namespace AutoSeeder.Services.ConstraintParsing
         public bool CanParse(Token token) =>
         token.Value.Equals("IDENTITY", StringComparison.OrdinalIgnoreCase);
 
-        public ColumnConstraintNode Parse(ParserContext ctx)
+
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
         {
-            ctx.Consume();
-            ctx.Expect(TokenType.Symbol, "(");
-            var seed = ctx.Expect(TokenType.Number).Value;
-            ctx.Expect(TokenType.Symbol, ",");
-            var inc = ctx.Expect(TokenType.Number).Value;
-            ctx.Expect(TokenType.Symbol, ")");
+            tokens.Consume();
+            tokens.Expect(TokenType.Symbol, "(");
+            var seed = tokens.Expect(TokenType.Number).Value;
+            tokens.Expect(TokenType.Symbol, ",");
+            var inc = tokens.Expect(TokenType.Number).Value;
+            tokens.Expect(TokenType.Symbol, ")");
 
             return new ColumnConstraintNode
             {

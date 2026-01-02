@@ -11,6 +11,7 @@ namespace AutoSeeder.Services.ConstraintParsing.Interfaces
     public interface IColumnConstraintParser
     {
         public bool CanParse(Token token);
-        public ColumnConstraintNode Parse(ParserContext context);
+        //public ColumnConstraintNode Parse(ParserContext context);
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context);
     }
 }

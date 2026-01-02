@@ -13,12 +13,12 @@ namespace AutoSeeder.Services.ConstraintParsing
     {
         public bool CanParse(Token token) => token.Value.Equals("DEFAULT", StringComparison.OrdinalIgnoreCase);
 
-        public ColumnConstraintNode Parse(ParserContext ctx)
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
         {
-            ctx.Consume();
+            tokens.Consume();
             return new ColumnConstraintNode
             {
-                Type = "DEFAULT " + ctx.Consume().Value
+                Type = "DEFAULT " + tokens.Consume().Value
             };
         }
     }

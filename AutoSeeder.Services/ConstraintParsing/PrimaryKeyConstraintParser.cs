@@ -13,10 +13,11 @@ namespace AutoSeeder.Services.ConstraintParsing
     {
         public bool CanParse(Token token) => token.Value.Equals("PRIMARY", StringComparison.OrdinalIgnoreCase);
 
-        public ColumnConstraintNode Parse(ParserContext ctx)
+
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
         {
-            ctx.Consume();
-            ctx.Expect(TokenType.Keyword, "KEY");
+            tokens.Consume();
+            tokens.Expect(TokenType.Keyword, "KEY");
 
             return new ColumnConstraintNode
             {

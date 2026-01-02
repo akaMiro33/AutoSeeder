@@ -13,9 +13,10 @@ namespace AutoSeeder.Services.ConstraintParsing
     {
         public bool CanParse(Token token) => token.Value.Equals("UNIQUE", StringComparison.OrdinalIgnoreCase);
 
-        public ColumnConstraintNode Parse(ParserContext context)
+
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
         {
-            context.Consume();
+            tokens.Consume();
 
             return new ColumnConstraintNode
             {

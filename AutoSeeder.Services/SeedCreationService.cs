@@ -9,7 +9,7 @@ namespace AutoSeeder.Services
 {
     public class SeedCreationService
     {
-        public List<string> GenerateSeedSql(List<CreateTableNode> tables)
+        public List<string> GenerateSeedSql(IReadOnlyList<CreateTableNode> tables)
         {
             var orderedTables = OrderByForeignKeys(tables);
             var sql = new List<string>();

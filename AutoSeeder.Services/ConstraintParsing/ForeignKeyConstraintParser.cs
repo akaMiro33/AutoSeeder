@@ -12,15 +12,16 @@ namespace AutoSeeder.Services.ConstraintParsing
     public class ForeignKeyConstraintParser : IColumnConstraintParser
     {
         public bool CanParse(Token token) =>  token.Value.Equals("FOREIGN", StringComparison.OrdinalIgnoreCase);
+     
 
-        public ColumnConstraintNode Parse(ParserContext ctx)
+        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
         {
-            ctx.Consume();
-            ctx.Expect(TokenType.Keyword, "KEY");
-            ctx.Expect(TokenType.Keyword, "REFERENCES");
+            tokens.Consume();
+            tokens.Expect(TokenType.Keyword, "KEY");
+            tokens.Expect(TokenType.Keyword, "REFERENCES");
 
-            var table = ctx.ParseTableName();
-            ctx.ParseIdentifierList();
+            var table = context.ParseTableName();
+            context.ParseIdentifierList();
 
             return new ColumnConstraintNode
             {

@@ -1,4 +1,5 @@
-﻿using AutoSeeder.Data.Common.Datatypes;
+﻿using AutoSeeder.Data.Common.DataTypeFactory;
+using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Enums;
 using AutoSeeder.Data.Models;
 using AutoSeeder.Services.ConstraintParsing;
@@ -15,9 +16,10 @@ namespace AutoSeeder.Services
 {
     public class ParserService
     {
-        public List<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens)
+        public IReadOnlyList<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers,
+            IDataTypeFactory dataTypeFactory)
         {
-            var context = new ParserContext(tokens);
+            var context = new ParserContext(tokens, constraintParsers, dataTypeFactory);
             var nodes = context.ParseTokens();
 
             return nodes;

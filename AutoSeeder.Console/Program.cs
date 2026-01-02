@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 //string tableSchema = "CREATE TABLE Persons (\r\n    PersonID int,\r\n    LastName varchar(255),\r\n    FirstName varchar(255),\r\n    Address varchar(255),\r\n    City varchar(255)\r\n);";
+using AutoSeeder.Data.Common.DataTypeFactory;
 using AutoSeeder.Services;
 using AutoSeeder.Services.ConstraintParsing;
 using AutoSeeder.Services.ConstraintParsing.Interfaces;
@@ -48,9 +49,11 @@ var parsers = new List<IColumnConstraintParser>()
    new IdentityConstraintParser()
 };
 
+IDataTypeFactory dataTypeFactory = new SqlTypeFactory();
+
 var parserService = new ParserService();
 var seedingCreationService = new SeedCreationService();
-var createTablesService = new TableRepresentationService(parserService, inputTableSchema);
+var createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory, inputTableSchema);
 var seedService = new SeedService(createTablesService, seedingCreationService);
 seedService.Create();
 
