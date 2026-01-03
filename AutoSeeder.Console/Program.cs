@@ -25,6 +25,33 @@ using System;
 //    """;
 
 
+//string inputTableSchema = """
+//    CREATE TABLE Customers (
+//        CustomerId INT PRIMARY KEY,
+//        Name NVARCHAR(100) NOT NULL,
+//        Email NVARCHAR(255) UNIQUE
+//    );
+
+//    CREATE TABLE Orders (
+//        OrderId INT PRIMARY KEY,
+//        CustomerId INT NOT NULL FOREIGN KEY REFERENCES Customers (CustomerId),
+//        OrderDate DATETIME2 NOT NULL,
+//        TotalAmount DECIMAL(10, 2) NOT NULL 
+//    );
+
+//    CREATE TABLE OrderItems (
+//        OrderItemId INT PRIMARY KEY,
+//        OrderId INT NOT NULL FOREIGN KEY REFERENCES Orders (OrderId),
+//        ProductName NVARCHAR(200) NOT NULL,
+//        Quantity INT NOT NULL,
+//        UnitPrice DECIMAL(10, 2) NOT NULL    
+//    );
+
+
+
+//    """;
+
+
 string inputTableSchema = """
     CREATE TABLE Customers (
         CustomerId INT PRIMARY KEY,
@@ -38,7 +65,21 @@ string inputTableSchema = """
         OrderDate DATETIME2 NOT NULL,
         TotalAmount DECIMAL(10, 2) NOT NULL 
     );
+
+
+
+         CREATE TABLE OrderItems (
+         OrderItemId INT PRIMARY KEY,
+         OrderId INT NOT NULL ,
+         ProductName NVARCHAR(200) NOT NULL,
+         Quantity INT NOT NULL,
+         UnitPrice DECIMAL(10, 2) NOT NULL,    
+    	 CONSTRAINT  FK_OrderItems_Orders FOREIGN KEY (OrderId) REFERENCES Orders (OrderId)
+     );
+
     """;
+
+
 
 var parsers = new List<IColumnConstraintParser>()
 {

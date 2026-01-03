@@ -15,7 +15,7 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
         token.Value.Equals("IDENTITY", StringComparison.OrdinalIgnoreCase);
 
 
-        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
+        public ConstraintNode Parse(TokenStream tokens, ParserContext context, string columnName)
         {
             tokens.Consume();
             tokens.Expect(TokenType.Symbol, "(");
@@ -24,9 +24,10 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
             var inc = tokens.Expect(TokenType.Number).Value;
             tokens.Expect(TokenType.Symbol, ")");
 
-            return new ColumnConstraintNode
+            return new ConstraintNode
             {
-                Type = $"IDENTITY({seed},{inc})"
+                Type = $"IDENTITY({seed},{inc})",
+                Columns = new List<string> { columnName }
             };
         }
     }

@@ -1,6 +1,7 @@
 ﻿using AutoSeeder.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,8 +70,8 @@ namespace AutoSeeder.Services.Seed
 
             foreach (var column in table.Columns)
             {
-                if (HasConstraint(column, "IDENTITY")) continue;
-                if (HasConstraint(column, "DEFAULT")) continue;
+                if (HasConstraint(column, table, "IDENTITY")) continue;
+                if (HasConstraint(column, table, "DEFAULT")) continue;
 
                 columns.Add(column.Name);
             }
@@ -80,11 +81,12 @@ namespace AutoSeeder.Services.Seed
             foreach (var column in table.Columns)
             {
                 // Skip IDENTITY and DEFAULT columns
-                if (HasConstraint(column, "IDENTITY") || HasConstraint(column, "DEFAULT")) continue;
+                if (HasConstraint(column, table, "IDENTITY") || HasConstraint(column, table, "DEFAULT")) continue;
 
                 var values = new List<string>();
 
-                var fk = column.Constraints.FirstOrDefault(c => c.Type == "FOREIGN KEY");
+                //var fk = column.Constraints.FirstOrDefault(c => c.Type == "FOREIGN KEY");
+                var fk = table.Constraints.FirstOrDefault(c => c.Columns.Contains(column.Name) && c.Type == "FOREIGN KEY");
 
                 if (fk != null)
                 {
@@ -100,7 +102,7 @@ namespace AutoSeeder.Services.Seed
                 else
                 {
                     values = column.DataType.GenerateValue(true, rowCount);
-                    if (HasConstraint(column, "PRIMARY")) {
+                    if (HasConstraint(column, table, "PRIMARY")) {
                         generatedIds[table.TableName] = values;
                     }
                 }
@@ -114,7 +116,7 @@ namespace AutoSeeder.Services.Seed
                 var row = new List<string>();
                 foreach (var column in table.Columns)
                 {
-                    if (HasConstraint(column, "IDENTITY") || HasConstraint(column, "DEFAULT")) continue;
+                    if (HasConstraint(column, table, "IDENTITY") || HasConstraint(column, table, "DEFAULT")) continue;
 
                     row.Add(columnValues[column.Name][i]);
                 }
@@ -128,6 +130,7 @@ namespace AutoSeeder.Services.Seed
                 $"{string.Join(", ", rows)};";
         }
 
-        private bool HasConstraint(ColumnNode column, string type) => column.Constraints.Any(c => c.Type.StartsWith(type));
+        //private bool HasConstraint(ColumnNode column, string type) => column.Constraints.Any(c => c.Type.StartsWith(type));
+        private bool HasConstraint(ColumnNode column, CreateTableNode table , string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
     }
 }

@@ -14,14 +14,15 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
        public bool CanParse(Token token) => token.Value.Equals("NOT", StringComparison.OrdinalIgnoreCase);
 
 
-        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
+        public ConstraintNode Parse(TokenStream tokens, ParserContext context, string columnName)
         {
             tokens.Consume();
             tokens.Expect(TokenType.Keyword, "NULL");
 
-            return new ColumnConstraintNode
+            return new ConstraintNode
             {
-                Type = "NOT NULL"
+                Type = "NOT NULL",
+                Columns = new List<string> { columnName }
             };
         }
     }

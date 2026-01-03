@@ -62,7 +62,15 @@ namespace AutoSeeder.Services.Parser
                 }
                 else
                 {
-                    table.Columns.Add(ParseColumn());
+                    //table.Columns.Add(ParseColumn());
+                    var (column, constraint) = ParseColumn();
+                    table.Columns.Add(column);
+
+                    if(constraint != null)
+                    {
+                        table.Constraints.Add(constraint);
+                    }
+
                 }
 
                 if (_tokens.Peek().Value == ",")
@@ -81,11 +89,11 @@ namespace AutoSeeder.Services.Parser
             return table;
         }
 
-        private TableConstraintNode ParseTableConstraint()
+        private ConstraintNode ParseTableConstraint()
         {
             _tokens.Expect(TokenType.Keyword, "CONSTRAINT");
 
-            var constraint = new TableConstraintNode
+            var constraint = new ConstraintNode
             {
                 Name = _tokens.Expect(TokenType.Identifier).Value
             };
@@ -148,53 +156,14 @@ namespace AutoSeeder.Services.Parser
             return name;
         }
 
-
-        //private IDataType ParseDataType()
-        //{
-
-        //    var type = _tokens.Expect(TokenType.Identifier).Value;
-        //    var dataTypeDescriptor = new DataTypeDescriptor()
-        //    {
-        //        Name = type,
-        //    };
-
-        //    if (_tokens.Peek()?.Value == "(")
-        //    {
-        //        _tokens.Consume(); // (
-        //                   //type += "(";
-
-        //        var firstNumber = int.Parse(_tokens.Expect(TokenType.Number).Value);
-
-        //        if (_tokens.Peek()?.Value == ",")
-        //        {
-        //            _tokens.Consume();
-        //            var secondNumber = int.Parse(_tokens.Expect(TokenType.Number).Value);
-        //            dataTypeDescriptor.Precision = firstNumber;
-        //            dataTypeDescriptor.Scale = secondNumber;
-
-        //        }
-        //        else
-        //        {
-        //            dataTypeDescriptor.Length = firstNumber;
-        //        }
-
-        //        _tokens.Expect(TokenType.Symbol, ")");
-        //        //type += ")";
-
-        //    }
-
-        //    var dataType = _dataTypeFactory.Create(dataTypeDescriptor);
-
-
-        //    return dataType;
-        //}
-
-        public ColumnNode ParseColumn()
+        public Tuple<ColumnNode, ConstraintNode> ParseColumn()
         {
             var column = new ColumnNode
             {
                 Name = _tokens.Expect(TokenType.Identifier).Value
             };
+
+            ConstraintNode tableConstraint = null;
 
             // Data type (e.g. INT, VARCHAR(50))
             //column.DataType = ParseDataType();
@@ -203,13 +172,17 @@ namespace AutoSeeder.Services.Parser
             while (_tokens.Peek() != null &&
                    _tokens.Peek().Type == TokenType.Keyword)
             {
-                column.Constraints.Add(ParseColumnConstraint());
+                //column.Constraints.Add(ParseColumnConstraint());
+                tableConstraint = ParseColumnConstraint(column.Name);
             }
 
-            return column;
+            //(ColumnNode column, ConstraintNode constraint) tuple = (column,tableConstraint);
+            Tuple<ColumnNode,ConstraintNode> tuple = new Tuple<ColumnNode, ConstraintNode> (column, tableConstraint);
+
+            return tuple;
         }
 
-        private ColumnConstraintNode ParseColumnConstraint()
+        private ConstraintNode ParseColumnConstraint(string columnName)
         {
             var token = _tokens.Peek()!;
 
@@ -220,7 +193,7 @@ namespace AutoSeeder.Services.Parser
                 throw new Exception(
                     $"Unknown column constraint: {token.Value}");
 
-            return parser.Parse(_tokens, this);
+            return parser.Parse(_tokens, this, columnName);
         }
 
     }

@@ -14,7 +14,7 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
         public bool CanParse(Token token) =>  token.Value.Equals("FOREIGN", StringComparison.OrdinalIgnoreCase);
      
 
-        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context)
+        public ConstraintNode Parse(TokenStream tokens, ParserContext context, string columnName)
         {
             tokens.Consume();
             tokens.Expect(TokenType.Keyword, "KEY");
@@ -23,10 +23,11 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
             var table = context.ParseTableName();
             context.ParseIdentifierList();
 
-            return new ColumnConstraintNode
+            return new ConstraintNode
             {
                 Type = "FOREIGN KEY",
-                ReferenceTable = table
+                ReferenceTable = table,
+                Columns = new List<string> { columnName }
             };
         }
     }

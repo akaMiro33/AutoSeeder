@@ -6,6 +6,6 @@ namespace AutoSeeder.Data.Models
     {
         public string Name { get; set; }
         public IDataType DataType { get; set; }
-        public List<ColumnConstraintNode> Constraints { get; set; } = new();
+        //public List<ColumnConstraintNode> Constraints { get; set; } = new();
     }
 }

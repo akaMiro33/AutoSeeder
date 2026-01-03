@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace AutoSeeder.Data.Models
 {
 
-    public class ColumnConstraintNode
-    {
-        public string Type { get; set; }
-        public string ReferenceTable { get; set; }
-    }
+    //public class ColumnConstraintNode
+    //{
+    //    public string Type { get; set; }
+    //    public string ReferenceTable { get; set; }
+    //}
 }

@@ -12,6 +12,6 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
     {
         public bool CanParse(Token token);
         //public ColumnConstraintNode Parse(ParserContext context);
-        public ColumnConstraintNode Parse(TokenStream tokens, ParserContext context);
+        public ConstraintNode Parse(TokenStream tokens, ParserContext context, string columnName);
     }
 }
