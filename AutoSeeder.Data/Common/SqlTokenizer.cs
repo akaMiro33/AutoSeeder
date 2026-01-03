@@ -12,6 +12,7 @@ namespace AutoSeeder.Data.Common
     {
         private static readonly HashSet<char> Symbols = ['(', ')', ',', ';', '.'];
         private static readonly HashSet<string> Keywords = ["CREATE", "TABLE", "PRIMARY", "KEY", "FOREIGN", "REFERENCES", "NOT", "NULL", "DEFAULT", "CHECK", "UNIQUE", "CONSTRAINT", "IDENTITY"];
+        private static readonly HashSet<string> IngoredKeywords = ["ON", "NO", "DELETE", "CASCADE", "UPDATE", "ACTION", "CLUSTERED", "NONCLUSTERED", "SET", "CHECK"];
 
         public static List<Token> GetTokens(string input)
         {
@@ -83,6 +84,11 @@ namespace AutoSeeder.Data.Common
 
                     string value = input[start..i];
 
+                    if(IsIgnoredKeyword(value))
+                    {
+                        continue;
+                    }
+
                     tokens.Add(new Token(
                         IsKeyword(value) ? TokenType.Keyword : TokenType.Identifier,
                         value
@@ -115,6 +121,11 @@ namespace AutoSeeder.Data.Common
         private static bool IsKeyword(string value)
         {
             return Keywords.Contains(value.Trim('[', ']', '"').ToUpper());
+        }
+
+        private static bool IsIgnoredKeyword(string value)
+        {
+            return IngoredKeywords.Contains(value.Trim('[', ']', '"').ToUpper());
         }
 
     }

@@ -15,7 +15,7 @@ namespace AutoSeeder.Services.Parser
 {
     public class ParserService
     {
-        public IReadOnlyList<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers,  IDataTypeFactory dataTypeFactory)
+        public IReadOnlyList<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory)
         {
             var context = new ParserContext(tokens, constraintParsers, dataTypeFactory);
             var nodes = context.ParseTokens();

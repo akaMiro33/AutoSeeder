@@ -31,7 +31,9 @@ namespace AutoSeeder.Services.Parser
             var nodes = new List<CreateTableNode>();
 
             while (_tokens.Peek() != null)
+            {
                 nodes.Add(ParseNode());
+            }
 
             return nodes;
         }
@@ -52,17 +54,34 @@ namespace AutoSeeder.Services.Parser
 
             while (true)
             {
-                if (_tokens.Peek()?.Type == TokenType.Keyword &&
-                    _tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
+                //if (_tokens.Peek()?.Type == TokenType.Keyword && _tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    table.Constraints.Add(ParseTableConstraint());
+                //} else if (_tokens.Peek()?.Type == TokenType.Keyword && _tokens.Peek().Value.Equals("FOREIGN", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    table.Constraints.Add(ParseTableConstraintForeignKey());
+                //}
+
+                if (_tokens.Peek()?.Type == TokenType.Keyword)
                 {
-                    table.Constraints.Add(ParseTableConstraint());
+
+                    var contraint = new ConstraintNode();
+
+                    if (_tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _tokens.Expect(TokenType.Keyword, "CONSTRAINT");
+                        contraint.Name = _tokens.Expect(TokenType.Identifier).Value;
+                    }
+
+                    ParseTableConstraint(contraint);
+
                 }
                 else
                 {
                     var (column, constraint) = ParseColumn();
                     table.Columns.Add(column);
 
-                    if(constraint != null)
+                    if (constraint != null)
                     {
                         table.Constraints.Add(constraint);
                     }
@@ -85,14 +104,14 @@ namespace AutoSeeder.Services.Parser
             return table;
         }
 
-        private ConstraintNode ParseTableConstraint()
+        private ConstraintNode ParseTableConstraint(ConstraintNode constraint)
         {
-            _tokens.Expect(TokenType.Keyword, "CONSTRAINT");
+            //_tokens.Expect(TokenType.Keyword, "CONSTRAINT");
 
-            var constraint = new ConstraintNode
-            {
-                Name = _tokens.Expect(TokenType.Identifier).Value
-            };
+            //var constraint = new ConstraintNode
+            //{
+            //    Name = _tokens.Expect(TokenType.Identifier).Value
+            //};
 
             if (_tokens.Peek().Value.Equals("PRIMARY", StringComparison.OrdinalIgnoreCase))
             {
@@ -112,7 +131,7 @@ namespace AutoSeeder.Services.Parser
 
                 _tokens.Expect(TokenType.Keyword, "REFERENCES");
                 constraint.ReferenceTable = ParseTableName();
-                ParseIdentifierList();
+                constraint.ReferenceColumns = ParseIdentifierList();
 
                 return constraint;
             }

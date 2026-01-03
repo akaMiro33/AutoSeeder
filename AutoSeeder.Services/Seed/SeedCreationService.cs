@@ -15,6 +15,7 @@ namespace AutoSeeder.Services.Seed
             var orderedTables = OrderByForeignKeys(tables);
             var sql = new List<string>();
 
+            //var generatedIds = new Dictionary<string, List<string>>();
             var generatedIds = new Dictionary<string, List<string>>();
 
             foreach (var table in orderedTables)
@@ -130,7 +131,6 @@ namespace AutoSeeder.Services.Seed
                 $"{string.Join(", ", rows)};";
         }
 
-        //private bool HasConstraint(ColumnNode column, string type) => column.Constraints.Any(c => c.Type.StartsWith(type));
         private bool HasConstraint(ColumnNode column, CreateTableNode table , string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
     }
 }
