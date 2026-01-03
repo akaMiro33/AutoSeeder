@@ -19,10 +19,7 @@ namespace AutoSeeder.Services.Parser
         private readonly IReadOnlyList<IColumnConstraintParser> _constraintParsers;
         private readonly IDataTypeFactory _dataTypeFactory;
 
-        public ParserContext(
-            IReadOnlyList<Token> tokens,
-            IEnumerable<IColumnConstraintParser> constraintParsers,
-            IDataTypeFactory dataTypeFactory)
+        public ParserContext(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory)
         {
             _tokens = new TokenStream(tokens);
             _constraintParsers = constraintParsers.ToList();
@@ -62,7 +59,6 @@ namespace AutoSeeder.Services.Parser
                 }
                 else
                 {
-                    //table.Columns.Add(ParseColumn());
                     var (column, constraint) = ParseColumn();
                     table.Columns.Add(column);
 
@@ -169,14 +165,11 @@ namespace AutoSeeder.Services.Parser
             //column.DataType = ParseDataType();
             column.DataType = _dataTypeFactory.Create(_tokens);
 
-            while (_tokens.Peek() != null &&
-                   _tokens.Peek().Type == TokenType.Keyword)
+            while (_tokens.Peek() != null && _tokens.Peek().Type == TokenType.Keyword)
             {
-                //column.Constraints.Add(ParseColumnConstraint());
                 tableConstraint = ParseColumnConstraint(column.Name);
             }
 
-            //(ColumnNode column, ConstraintNode constraint) tuple = (column,tableConstraint);
             Tuple<ColumnNode,ConstraintNode> tuple = new Tuple<ColumnNode, ConstraintNode> (column, tableConstraint);
 
             return tuple;
