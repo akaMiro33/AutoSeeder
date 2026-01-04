@@ -93,14 +93,13 @@ string inputTableSchema = """
         TotalAmount DECIMAL(10, 2) NOT NULL 
     );
 
-         CREATE TABLE OrderItems (
+    CREATE TABLE OrderItems (
          OrderItemId INT,
-         ItemId INT,
          OrderId INT NOT NULL,
          ProductName NVARCHAR(200) NOT NULL,
          Quantity INT NOT NULL,
          UnitPrice DECIMAL(10, 2) NOT NULL,   
-         PRIMARY KEY (OrderItemId, ItemId),
+         PRIMARY KEY (OrderItemId),
     	 CONSTRAINT  FK_OrderItems_Orders FOREIGN KEY (OrderId) REFERENCES Orders (OrderId) ON DELETE CASCADE ON UPDATE NO ACTION
      );
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSeeder.Data", "..\AutoS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSeeder.Services", "..\AutoSeeder.Services\AutoSeeder.Services.csproj", "{FDF03CEC-58A2-8D84-808C-6A853E127383}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoSeeder.Web", "..\AutoSeeder.Web\AutoSeeder.Web.csproj", "{2AE4E5BE-3EF5-4111-A6EB-1277EBFDD4E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FDF03CEC-58A2-8D84-808C-6A853E127383}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDF03CEC-58A2-8D84-808C-6A853E127383}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDF03CEC-58A2-8D84-808C-6A853E127383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AE4E5BE-3EF5-4111-A6EB-1277EBFDD4E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AE4E5BE-3EF5-4111-A6EB-1277EBFDD4E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AE4E5BE-3EF5-4111-A6EB-1277EBFDD4E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AE4E5BE-3EF5-4111-A6EB-1277EBFDD4E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
