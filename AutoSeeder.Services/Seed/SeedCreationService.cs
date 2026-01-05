@@ -1,6 +1,7 @@
 ﻿using AutoSeeder.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -15,16 +16,12 @@ namespace AutoSeeder.Services.Seed
             var orderedTables = OrderByForeignKeys(tables);
             var sql = new List<string>();
 
-            //var generatedIds = new Dictionary<string, List<string>>();
-            var generatedIds = new Dictionary<string, List<string>>();
+            var generatedIds = new Dictionary<(string Table, string Column), List<string>>();
 
             foreach (var table in orderedTables)
             {
                 var insert = GenerateInsert(table, generatedIds, 100);
                 sql.Add(insert);
-
-                // simulate identity PK = 1
-                //generatedIds[table.TableName] = 1;
             }
 
             return sql;
@@ -63,8 +60,7 @@ namespace AutoSeeder.Services.Seed
         }
 
 
-        private string GenerateInsert(CreateTableNode table, Dictionary<string, List<string>> generatedIds, int rowCount)
-        //private string GenerateInsert(CreateTableNode table, int rowCount)
+        private string GenerateInsert(CreateTableNode table, Dictionary<(string Table, string Column), List<string>> generatedIds, int rowCount)
         {
             var columns = new List<string>();
             var rows = new List<string>();
@@ -86,30 +82,81 @@ namespace AutoSeeder.Services.Seed
 
                 var values = new List<string>();
 
-                //var fk = column.Constraints.FirstOrDefault(c => c.Type == "FOREIGN KEY");
                 var fk = table.Constraints.FirstOrDefault(c => c.Columns.Contains(column.Name) && c.Type == "FOREIGN KEY");
 
                 if (fk != null)
                 {
-                    var ids = generatedIds[fk.ReferenceTable];
-                    var random = new Random();
+                    ////var ids = generatedIds[fk.ReferenceTable];
+                    //var ids = generatedIds[(Table: fk.ReferenceTable, Column: column.Name)];
+                    //// I will change this to tuple and check it with benchmark
+                    //var random = new Random();
 
-                    for (int i = 0; i < rowCount; i++)
-                    {
-                        int index = random.Next(ids.Count);
-                        values.Add(ids[index].ToString());
-                    }
+                    //for (int i = 0; i < rowCount; i++)
+                    //{
+                    //    int index = random.Next(ids.Count);
+                    //    values.Add(ids[index].ToString());
+                    //}
                 }
                 else
                 {
                     values = column.DataType.GenerateValue(true, rowCount);
-                    if (HasConstraint(column, table, "PRIMARY")) {
-                        generatedIds[table.TableName] = values;
+                    if (HasConstraint(column, table, "PRIMARY"))
+                    {
+                        generatedIds[(Table: table.TableName, Column: column.Name)] = values;
+                        // I will change this to tuple and check it with benchmarkS
                     }
                 }
 
                 columnValues[column.Name] = values;
             }
+
+            foreach (var constraint in table.Constraints.Where(con => con.Type == "FOREIGN KEY"))
+            {
+                var idsGroup = new List<List<string>>();
+                var poradieColuimns = new List<string>();
+
+                for (int i = 0; i < constraint.Columns.Count; i++)
+                {
+                    idsGroup.Add(generatedIds[(Table: constraint.ReferenceTable, Column: constraint.Columns[i])]);
+                    poradieColuimns.Add(constraint.ReferenceColumns[i]);
+
+                }
+
+                var random = new Random();
+                var ValuesArray = new Dictionary<string, List<string>>();
+
+                for (int j = 0; j < rowCount; j++)
+                {
+                    int index = random.Next(100);
+
+                    if (j == 0)
+                    {
+                        for (int z = 0; z < poradieColuimns.Count; z++)
+                        {
+                            ValuesArray[poradieColuimns[z]] = new List<string>();
+                        }
+                    }
+
+
+                    for (int z = 0; z < poradieColuimns.Count; z++)
+                    {
+                        ValuesArray[poradieColuimns[z]].Add(idsGroup[z][index]);
+                    }
+
+                }
+
+
+                for (int ii = 0; ii < poradieColuimns.Count; ii++)
+                {
+                    generatedIds[(Table: table.TableName, Column: poradieColuimns[ii])] = ValuesArray[poradieColuimns[ii]];
+                    columnValues[poradieColuimns[ii]] = ValuesArray[poradieColuimns[ii]];
+                }
+
+
+
+            }
+
+
 
             // Assemble rows from column values
             for (int i = 0; i < rowCount; i++)
@@ -131,6 +178,6 @@ namespace AutoSeeder.Services.Seed
                 $"{string.Join(", ", rows)};";
         }
 
-        private bool HasConstraint(ColumnNode column, CreateTableNode table , string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
+        private bool HasConstraint(ColumnNode column, CreateTableNode table, string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
     }
 }

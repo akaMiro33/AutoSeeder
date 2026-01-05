@@ -79,31 +79,96 @@ using System;
 
 //    """;
 
+//string inputTableSchema = """
+//    CREATE TABLE Customers (
+//        CustomerId INT PRIMARY KEY,
+//        Name NVARCHAR(100) NOT NULL,
+//        Email NVARCHAR(255) UNIQUE
+//    );
+
+//    CREATE TABLE Orders (
+//        OrderId INT PRIMARY KEY,
+//        CustomerId INT NOT NULL FOREIGN KEY REFERENCES Customers (CustomerId),
+//        OrderDate DATETIME2 NOT NULL,
+//        TotalAmount DECIMAL(10, 2) NOT NULL 
+//    );
+
+//    CREATE TABLE OrderItems (
+//         OrderItemId INT,
+//         ItemId INT,
+//         OrderId INT NOT NULL,
+//         ProductName NVARCHAR(200) NOT NULL,
+//         Quantity INT NOT NULL,
+//         UnitPrice DECIMAL(10, 2) NOT NULL,   
+//         PRIMARY KEY (OrderItemId, ItemId),
+//    	 CONSTRAINT  FK_OrderItems_Orders FOREIGN KEY (OrderId) REFERENCES Orders (OrderId) ON DELETE CASCADE ON UPDATE NO ACTION
+//     );
+
+//    CREATE TABLE OrderItemParts (
+//         OrderItemPartId INT,
+//         OrderItemId INT,
+//         ItemId INT,
+//         ProductName NVARCHAR(200) NOT NULL,
+//         Quantity INT NOT NULL,
+//         UnitPrice DECIMAL(10, 2) NOT NULL,   
+//         PRIMARY KEY (OrderItemPartId),
+//    	 CONSTRAINT FK_OrderItemParts_OrderItems FOREIGN KEY (OrderItemId, ItemId) REFERENCES OrderItems (OrderItemId, ItemId) ON DELETE CASCADE ON UPDATE NO ACTION
+//     );
+
+
+//    """;
+
 string inputTableSchema = """
-    CREATE TABLE Customers (
-        CustomerId INT PRIMARY KEY,
-        Name NVARCHAR(100) NOT NULL,
-        Email NVARCHAR(255) UNIQUE
-    );
-
-    CREATE TABLE Orders (
-        OrderId INT PRIMARY KEY,
-        CustomerId INT NOT NULL FOREIGN KEY REFERENCES Customers (CustomerId),
-        OrderDate DATETIME2 NOT NULL,
-        TotalAmount DECIMAL(10, 2) NOT NULL 
-    );
-
     CREATE TABLE OrderItems (
          OrderItemId INT,
+         ItemId INT,
          OrderId INT NOT NULL,
          ProductName NVARCHAR(200) NOT NULL,
          Quantity INT NOT NULL,
          UnitPrice DECIMAL(10, 2) NOT NULL,   
-         PRIMARY KEY (OrderItemId),
-    	 CONSTRAINT  FK_OrderItems_Orders FOREIGN KEY (OrderId) REFERENCES Orders (OrderId) ON DELETE CASCADE ON UPDATE NO ACTION
+         PRIMARY KEY (OrderItemId, ItemId)
+    	 
      );
 
+    CREATE TABLE OrderItemParts (
+         OrderItemPartId INT,
+         OrderItemId INT,
+         ItemId INT,
+         ProductName NVARCHAR(200) NOT NULL,
+         Quantity INT NOT NULL,
+         UnitPrice DECIMAL(10, 2) NOT NULL,   
+         PRIMARY KEY (OrderItemPartId),
+    	 CONSTRAINT FK_OrderItemParts_OrderItems FOREIGN KEY (OrderItemId, ItemId) REFERENCES OrderItems (OrderItemId, ItemId) ON DELETE CASCADE ON UPDATE NO ACTION
+     );
+
+
     """;
+
+
+//string inputTableSchema = """
+//    CREATE TABLE OrderItems (
+//         OrderItemId INT,
+//         ItemId INT,
+//         OrderId INT NOT NULL,
+//         ProductName NVARCHAR(200) NOT NULL,
+//         Quantity INT NOT NULL,
+//         UnitPrice DECIMAL(10, 2) NOT NULL,   
+//         PRIMARY KEY (OrderItemId)
+
+//     );
+
+//    CREATE TABLE OrderItemParts (
+//         OrderItemPartId INT,
+//         OrderItemId INT,
+//         ProductName NVARCHAR(200) NOT NULL,
+//         Quantity INT NOT NULL,
+//         UnitPrice DECIMAL(10, 2) NOT NULL,   
+//         PRIMARY KEY (OrderItemPartId),
+//    	 CONSTRAINT FK_OrderItemParts_OrderItems FOREIGN KEY (OrderItemId) REFERENCES OrderItems (OrderItemId) ON DELETE CASCADE ON UPDATE NO ACTION
+//     );
+
+
+//    """;
 
 
 
@@ -147,7 +212,6 @@ var parsers = new List<IColumnConstraintParser>()
 };
 
 IDataTypeFactory dataTypeFactory = new SqlTypeFactory();
-
 var parserService = new ParserService();
 var seedingCreationService = new SeedCreationService();
 var createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory, inputTableSchema);

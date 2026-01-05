@@ -3,6 +3,7 @@ using AutoSeeder.Data.Models;
 using AutoSeeder.Services.Parser;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,13 +22,14 @@ namespace AutoSeeder.Services.Common.ConstraintParsing
             tokens.Expect(TokenType.Keyword, "REFERENCES");
 
             var table = context.ParseTableName();
-            context.ParseIdentifierList();
+            var referenceColumns = context.ParseIdentifierList();
 
             return new ConstraintNode
             {
                 Type = "FOREIGN KEY",
                 ReferenceTable = table,
-                Columns = new List<string> { columnName }
+                Columns = new List<string> { columnName },
+                ReferenceColumns = referenceColumns
             };
         }
     }

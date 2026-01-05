@@ -54,27 +54,9 @@ namespace AutoSeeder.Services.Parser
 
             while (true)
             {
-                //if (_tokens.Peek()?.Type == TokenType.Keyword && _tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    table.Constraints.Add(ParseTableConstraint());
-                //} else if (_tokens.Peek()?.Type == TokenType.Keyword && _tokens.Peek().Value.Equals("FOREIGN", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    table.Constraints.Add(ParseTableConstraintForeignKey());
-                //}
-
                 if (_tokens.Peek()?.Type == TokenType.Keyword)
                 {
-
-                    var contraint = new ConstraintNode();
-
-                    if (_tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
-                    {
-                        _tokens.Expect(TokenType.Keyword, "CONSTRAINT");
-                        contraint.Name = _tokens.Expect(TokenType.Identifier).Value;
-                    }
-
-                    ParseTableConstraint(contraint);
-
+                    table.Constraints.Add(ParseTableConstraint());
                 }
                 else
                 {
@@ -85,7 +67,6 @@ namespace AutoSeeder.Services.Parser
                     {
                         table.Constraints.Add(constraint);
                     }
-
                 }
 
                 if (_tokens.Peek().Value == ",")
@@ -104,14 +85,15 @@ namespace AutoSeeder.Services.Parser
             return table;
         }
 
-        private ConstraintNode ParseTableConstraint(ConstraintNode constraint)
+        private ConstraintNode ParseTableConstraint()
         {
-            //_tokens.Expect(TokenType.Keyword, "CONSTRAINT");
-
-            //var constraint = new ConstraintNode
-            //{
-            //    Name = _tokens.Expect(TokenType.Identifier).Value
-            //};
+            var constraint = new ConstraintNode();
+            
+            if (_tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
+            {
+                _tokens.Expect(TokenType.Keyword, "CONSTRAINT");
+                constraint.Name = _tokens.Expect(TokenType.Identifier).Value;
+            }
 
             if (_tokens.Peek().Value.Equals("PRIMARY", StringComparison.OrdinalIgnoreCase))
             {
