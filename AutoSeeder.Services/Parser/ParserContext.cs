@@ -63,9 +63,9 @@ namespace AutoSeeder.Services.Parser
                     var (column, constraint) = ParseColumn();
                     table.Columns.Add(column);
 
-                    if (constraint != null)
+                    if (constraint != null && constraint.Count > 0)
                     {
-                        table.Constraints.Add(constraint);
+                        table.Constraints.AddRange(constraint);
                     }
                 }
 
@@ -153,39 +153,35 @@ namespace AutoSeeder.Services.Parser
             return name;
         }
 
-        public Tuple<ColumnNode, ConstraintNode> ParseColumn()
+        public (ColumnNode Column, List<ConstraintNode> Constraints) ParseColumn()
         {
             var column = new ColumnNode
             {
                 Name = _tokens.Expect(TokenType.Identifier).Value
             };
 
-            ConstraintNode tableConstraint = null;
-
-            // Data type (e.g. INT, VARCHAR(50))
-            //column.DataType = ParseDataType();
             column.DataType = _dataTypeFactory.Create(_tokens);
 
-            while (_tokens.Peek() != null && _tokens.Peek().Type == TokenType.Keyword)
+            var constraints = new List<ConstraintNode>();
+
+            while (_tokens.Peek()?.Type == TokenType.Keyword)
             {
-                tableConstraint = ParseColumnConstraint(column.Name);
+                constraints.Add(ParseColumnConstraint(column.Name));
             }
 
-            Tuple<ColumnNode,ConstraintNode> tuple = new Tuple<ColumnNode, ConstraintNode> (column, tableConstraint);
-
-            return tuple;
+            return (column, constraints);
         }
 
         private ConstraintNode ParseColumnConstraint(string columnName)
         {
             var token = _tokens.Peek()!;
 
-            var parser = _constraintParsers
-                .FirstOrDefault(p => p.CanParse(token));
+            var parser = _constraintParsers.FirstOrDefault(p => p.CanParse(token));
 
             if (parser is null)
-                throw new Exception(
-                    $"Unknown column constraint: {token.Value}");
+            {
+                throw new Exception($"Unknown column constraint: {token.Value}");
+            }
 
             return parser.Parse(_tokens, this, columnName);
         }
