@@ -1,6 +1,7 @@
 ﻿using AutoSeeder.Data.Models;
 using Microsoft.VisualBasic;
 using System;
+using System.Text;
 
 namespace AutoSeeder.Services.Seed
 {
@@ -14,11 +15,15 @@ namespace AutoSeeder.Services.Seed
             this.seedCreationService = seedCreationService;
         }
 
-        public string Create()
+        public string Create(string schemaText)
         {
-            var tables = createTablesService.Create();
-            var seed = seedCreationService.GenerateSeedSql(tables);
-            return "";
+            var tables = createTablesService.Create(schemaText);
+            var seedArrays = seedCreationService.GenerateSeedSql(tables);
+            var sb = new StringBuilder();
+            sb.AppendJoin(Environment.NewLine, seedArrays);
+            var seed = sb.ToString();
+
+            return seed;
         }
     }
 }

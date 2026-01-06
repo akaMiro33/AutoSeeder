@@ -15,22 +15,20 @@ namespace AutoSeeder.Services
 {
     public class TableRepresentationService
     {
-        private readonly string schemaText;
         private readonly ParserService parserService;
         private readonly List<IColumnConstraintParser> parsers;
         private readonly IDataTypeFactory dataTypeFactory;
 
-        public TableRepresentationService(ParserService parserService, List<IColumnConstraintParser> parsers, IDataTypeFactory dataTypeFactory,  string schemaText)
+        public TableRepresentationService(ParserService parserService, List<IColumnConstraintParser> parsers, IDataTypeFactory dataTypeFactory)
         {
-            this.schemaText = schemaText;
             this.parserService = parserService;
             this.parsers = parsers;
             this.dataTypeFactory = dataTypeFactory;
         }
 
-        public IReadOnlyList<CreateTableNode> Create()
+        public IReadOnlyList<CreateTableNode> Create(string schemaText)
         {
-            var tokens = SqlTokenizer.GetTokens(this.schemaText);
+            var tokens = SqlTokenizer.GetTokens(schemaText);
             var tables = parserService.ParseTokens(tokens, parsers, dataTypeFactory);
 
 

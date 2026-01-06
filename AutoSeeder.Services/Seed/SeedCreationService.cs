@@ -11,6 +11,8 @@ namespace AutoSeeder.Services.Seed
 {
     public class SeedCreationService
     {
+        private static readonly Random random = new Random();
+
         public List<string> GenerateSeedSql(IReadOnlyList<CreateTableNode> tables)
         {
             var orderedTables = OrderByForeignKeys(tables);
@@ -62,9 +64,12 @@ namespace AutoSeeder.Services.Seed
 
         private string GenerateInsert(CreateTableNode table, Dictionary<(string Table, string Column), List<string>> generatedIds, int rowCount)
         {
-            var columns = new List<string>();
             var rows = new List<string>();
+            var columnValues = new Dictionary<string, List<string>>();
+            var columns = new List<string>();
 
+
+            //creates column for insert statement e.g. "INSERT VALUES INTO (columns)
             foreach (var column in table.Columns)
             {
                 if (HasConstraint(column, table, "IDENTITY")) continue;
@@ -73,90 +78,47 @@ namespace AutoSeeder.Services.Seed
                 columns.Add(column.Name);
             }
 
-            var columnValues = new Dictionary<string, List<string>>();
+            var noForeignKeyColumns = table.Columns.Where(col => !HasConstraint(col, table, "FOREIGN KEY")).ToList();
 
-            foreach (var column in table.Columns)
+            foreach (var column in noForeignKeyColumns)
             {
                 // Skip IDENTITY and DEFAULT columns
                 if (HasConstraint(column, table, "IDENTITY") || HasConstraint(column, table, "DEFAULT")) continue;
 
-                var values = new List<string>();
-
-                var fk = table.Constraints.FirstOrDefault(c => c.Columns.Contains(column.Name) && c.Type == "FOREIGN KEY");
-
-                if (fk != null)
+                var values = column.DataType.GenerateValue(true, rowCount);
+                if (HasConstraint(column, table, "PRIMARY"))
                 {
-                    ////var ids = generatedIds[fk.ReferenceTable];
-                    //var ids = generatedIds[(Table: fk.ReferenceTable, Column: column.Name)];
-                    //// I will change this to tuple and check it with benchmark
-                    //var random = new Random();
-
-                    //for (int i = 0; i < rowCount; i++)
-                    //{
-                    //    int index = random.Next(ids.Count);
-                    //    values.Add(ids[index].ToString());
-                    //}
-                }
-                else
-                {
-                    values = column.DataType.GenerateValue(true, rowCount);
-                    if (HasConstraint(column, table, "PRIMARY"))
-                    {
-                        generatedIds[(Table: table.TableName, Column: column.Name)] = values;
-                        // I will change this to tuple and check it with benchmarkS
-                    }
+                    generatedIds[(Table: table.TableName, Column: column.Name)] = values;
+                    // I will change this to tuple and check it with benchmarkS
                 }
 
                 columnValues[column.Name] = values;
             }
 
-            foreach (var constraint in table.Constraints.Where(con => con.Type == "FOREIGN KEY"))
+            foreach (var fk in table.Constraints.Where(c => c.Type == "FOREIGN KEY"))
             {
-                var idsGroup = new List<List<string>>();
-                var poradieColuimns = new List<string>();
+                // Map referenced columns to their generated IDs
+                var refIdGroups = fk.Columns.Select(col => generatedIds[(fk.ReferenceTable, col)]).ToList();
 
-                for (int i = 0; i < constraint.Columns.Count; i++)
+                // List of corresponding foreign key target columns
+                var fkColumns = fk.ReferenceColumns.ToList();
+                var valuesByColumn = fkColumns.ToDictionary(col => col, col => new List<string>());
+
+                for (int row = 0; row < rowCount; row++)
                 {
-                    idsGroup.Add(generatedIds[(Table: constraint.ReferenceTable, Column: constraint.Columns[i])]);
-                    poradieColuimns.Add(constraint.ReferenceColumns[i]);
+                    int refRow = random.Next(rowCount);
 
-                }
-
-                var random = new Random();
-                var ValuesArray = new Dictionary<string, List<string>>();
-
-                for (int j = 0; j < rowCount; j++)
-                {
-                    int index = random.Next(100);
-
-                    if (j == 0)
+                    for (int col = 0; col < fkColumns.Count; col++)
                     {
-                        for (int z = 0; z < poradieColuimns.Count; z++)
-                        {
-                            ValuesArray[poradieColuimns[z]] = new List<string>();
-                        }
+                        valuesByColumn[fkColumns[col]].Add(refIdGroups[col][refRow]);
                     }
-
-
-                    for (int z = 0; z < poradieColuimns.Count; z++)
-                    {
-                        ValuesArray[poradieColuimns[z]].Add(idsGroup[z][index]);
-                    }
-
                 }
 
-
-                for (int ii = 0; ii < poradieColuimns.Count; ii++)
+                foreach (var col in fkColumns)
                 {
-                    generatedIds[(Table: table.TableName, Column: poradieColuimns[ii])] = ValuesArray[poradieColuimns[ii]];
-                    columnValues[poradieColuimns[ii]] = ValuesArray[poradieColuimns[ii]];
+                    columnValues[col] = valuesByColumn[col];
                 }
-
-
-
             }
-
-
 
             // Assemble rows from column values
             for (int i = 0; i < rowCount; i++)
@@ -177,6 +139,41 @@ namespace AutoSeeder.Services.Seed
                 $"({string.Join(", ", columns)}) VALUES " +
                 $"{string.Join(", ", rows)};";
         }
+
+        //private string TransformDataToInsert(CreateTableNode table, Dictionary<string, List<string>> columnValues, int rowCount)
+        //{
+        //    var rows = new List<string>();
+        //    var columns = new List<string>();
+
+
+        //    //creates column for insert statement e.g. "INSERT VALUES INTO (columns)
+        //    foreach (var column in table.Columns)
+        //    {
+        //        if (HasConstraint(column, table, "IDENTITY")) continue;
+        //        if (HasConstraint(column, table, "DEFAULT")) continue;
+
+        //        columns.Add(column.Name);
+        //    }
+
+        //    // Assemble rows from column values
+        //    for (int i = 0; i < rowCount; i++)
+        //    {
+        //        var row = new List<string>();
+        //        foreach (var column in table.Columns)
+        //        {
+        //            if (HasConstraint(column, table, "IDENTITY") || HasConstraint(column, table, "DEFAULT")) continue;
+
+        //            row.Add(columnValues[column.Name][i]);
+        //        }
+
+        //        rows.Add($"({string.Join(", ", row)})");
+        //    }
+
+        //    return
+        //        $"INSERT INTO {table.TableName} " +
+        //        $"({string.Join(", ", columns)}) VALUES " +
+        //        $"{string.Join(", ", rows)};";
+        //}
 
         private bool HasConstraint(ColumnNode column, CreateTableNode table, string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
     }

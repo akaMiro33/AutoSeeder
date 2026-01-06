@@ -214,9 +214,9 @@ var parsers = new List<IColumnConstraintParser>()
 IDataTypeFactory dataTypeFactory = new SqlTypeFactory();
 var parserService = new ParserService();
 var seedingCreationService = new SeedCreationService();
-var createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory, inputTableSchema);
+var createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory);
 var seedService = new SeedService(createTablesService, seedingCreationService);
-seedService.Create();
+seedService.Create(inputTableSchema);
 
 // to-do - composite primary keys and foreign keys
 // to-do - everything that is not involved in CREATE TABLE - that is things like ADD CONSTRAINTS
