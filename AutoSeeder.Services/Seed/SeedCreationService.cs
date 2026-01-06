@@ -13,18 +13,21 @@ namespace AutoSeeder.Services.Seed
     {
         private static readonly Random random = new Random();
 
-        public List<string> GenerateSeedSql(IReadOnlyList<CreateTableNode> tables)
+        public string GenerateSeedSql(IReadOnlyList<CreateTableNode> tables)
         {
             var orderedTables = OrderByForeignKeys(tables);
-            var sql = new List<string>();
+            string sql;
+            StringBuilder sb = new StringBuilder();
 
             var generatedIds = new Dictionary<(string Table, string Column), List<string>>();
 
             foreach (var table in orderedTables)
             {
                 var insert = GenerateInsert(table, generatedIds, 100);
-                sql.Add(insert);
+                sb.AppendLine(insert);
             }
+
+            sql = sb.ToString();
 
             return sql;
         }
@@ -64,20 +67,17 @@ namespace AutoSeeder.Services.Seed
 
         private string GenerateInsert(CreateTableNode table, Dictionary<(string Table, string Column), List<string>> generatedIds, int rowCount)
         {
-            var rows = new List<string>();
+            var columnValues = GenerateValues(table, generatedIds, rowCount);
+            var foreignKeysValues = GenerateForeignKeyValues(table, generatedIds, rowCount);
+
+            var allColumnValues = columnValues.Concat(foreignKeysValues).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            return TransformDataToInsert(table, allColumnValues, rowCount);
+        }
+
+        private Dictionary<string, List<string>>  GenerateValues(CreateTableNode table, Dictionary<(string Table, string Column), List<string>> generatedIds, int rowCount)
+        {
             var columnValues = new Dictionary<string, List<string>>();
-            var columns = new List<string>();
-
-
-            //creates column for insert statement e.g. "INSERT VALUES INTO (columns)
-            foreach (var column in table.Columns)
-            {
-                if (HasConstraint(column, table, "IDENTITY")) continue;
-                if (HasConstraint(column, table, "DEFAULT")) continue;
-
-                columns.Add(column.Name);
-            }
-
             var noForeignKeyColumns = table.Columns.Where(col => !HasConstraint(col, table, "FOREIGN KEY")).ToList();
 
             foreach (var column in noForeignKeyColumns)
@@ -94,6 +94,13 @@ namespace AutoSeeder.Services.Seed
 
                 columnValues[column.Name] = values;
             }
+
+            return columnValues;
+        }
+
+        private Dictionary<string, List<string>> GenerateForeignKeyValues(CreateTableNode table, Dictionary<(string Table, string Column), List<string>> generatedIds, int rowCount)
+        {
+            var columnValues = new Dictionary<string, List<string>>();
 
             foreach (var fk in table.Constraints.Where(c => c.Type == "FOREIGN KEY"))
             {
@@ -120,6 +127,24 @@ namespace AutoSeeder.Services.Seed
                 }
             }
 
+            return columnValues;
+        }
+
+        private string TransformDataToInsert(CreateTableNode table, Dictionary<string, List<string>> columnValues, int rowCount)
+        {
+            var rows = new List<string>();
+            var columns = new List<string>();
+
+
+            //creates column for insert statement e.g. "INSERT VALUES INTO (columns)
+            foreach (var column in table.Columns)
+            {
+                if (HasConstraint(column, table, "IDENTITY")) continue;
+                if (HasConstraint(column, table, "DEFAULT")) continue;
+
+                columns.Add(column.Name);
+            }
+
             // Assemble rows from column values
             for (int i = 0; i < rowCount; i++)
             {
@@ -139,41 +164,6 @@ namespace AutoSeeder.Services.Seed
                 $"({string.Join(", ", columns)}) VALUES " +
                 $"{string.Join(", ", rows)};";
         }
-
-        //private string TransformDataToInsert(CreateTableNode table, Dictionary<string, List<string>> columnValues, int rowCount)
-        //{
-        //    var rows = new List<string>();
-        //    var columns = new List<string>();
-
-
-        //    //creates column for insert statement e.g. "INSERT VALUES INTO (columns)
-        //    foreach (var column in table.Columns)
-        //    {
-        //        if (HasConstraint(column, table, "IDENTITY")) continue;
-        //        if (HasConstraint(column, table, "DEFAULT")) continue;
-
-        //        columns.Add(column.Name);
-        //    }
-
-        //    // Assemble rows from column values
-        //    for (int i = 0; i < rowCount; i++)
-        //    {
-        //        var row = new List<string>();
-        //        foreach (var column in table.Columns)
-        //        {
-        //            if (HasConstraint(column, table, "IDENTITY") || HasConstraint(column, table, "DEFAULT")) continue;
-
-        //            row.Add(columnValues[column.Name][i]);
-        //        }
-
-        //        rows.Add($"({string.Join(", ", row)})");
-        //    }
-
-        //    return
-        //        $"INSERT INTO {table.TableName} " +
-        //        $"({string.Join(", ", columns)}) VALUES " +
-        //        $"{string.Join(", ", rows)};";
-        //}
 
         private bool HasConstraint(ColumnNode column, CreateTableNode table, string type) => table.Constraints.Any(c => c.Columns.Contains(column.Name) && c.Type.StartsWith(type));
     }

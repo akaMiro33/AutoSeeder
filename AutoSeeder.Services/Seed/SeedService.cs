@@ -18,10 +18,7 @@ namespace AutoSeeder.Services.Seed
         public string Create(string schemaText)
         {
             var tables = createTablesService.Create(schemaText);
-            var seedArrays = seedCreationService.GenerateSeedSql(tables);
-            var sb = new StringBuilder();
-            sb.AppendJoin(Environment.NewLine, seedArrays);
-            var seed = sb.ToString();
+            var seed = seedCreationService.GenerateSeedSql(tables);
 
             return seed;
         }
