@@ -13,11 +13,9 @@ namespace AutoSeeder.Services.Parser
         private int _position;
         private readonly IReadOnlyList<Token> _tokens;
 
-        public TokenStream(IReadOnlyList<Token> tokens)
-            => _tokens = tokens;
+        public TokenStream(IReadOnlyList<Token> tokens) => _tokens = tokens;
 
-        public Token? Peek() =>
-            _position < _tokens.Count ? _tokens[_position] : null;
+        public Token? Peek() => _position < _tokens.Count ? _tokens[_position] : null;
 
         public Token Consume() => _tokens[_position++];
 
@@ -25,13 +23,9 @@ namespace AutoSeeder.Services.Parser
         {
             var token = Peek();
 
-            if (token is null ||
-                token.Type != type ||
-                value != null &&
-                 !token.Value.Equals(value, StringComparison.OrdinalIgnoreCase))
+            if (token is null || token.Type != type || value != null && !token.Value.Equals(value, StringComparison.OrdinalIgnoreCase))
             {
-                throw new Exception(
-                    $"Expected {type} {value}, got {token?.Value}");
+                throw new Exception($"Expected {type} {value}, got {token?.Value}");
             }
 
             return Consume();
