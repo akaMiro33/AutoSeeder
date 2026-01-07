@@ -10,10 +10,9 @@ namespace AutoSeeder.Services.Seed
     public class InsertGenerator
     {
         public required int RowCount { get; set; }
-
         private static readonly Random random = new Random();
 
-        public string Generate(CreateTableNode table, Dictionary<(string table, string column), List<string>> generatedIds)
+        public string Generate(CreateTableNode table, Dictionary<string, Dictionary<string, List<string>>> generatedIds)
         {
             var columnValues = GenerateValues(table, generatedIds);
             var foreignKeysValues = GenerateForeignKeyValues(table, generatedIds);
@@ -23,7 +22,7 @@ namespace AutoSeeder.Services.Seed
             return TransformDataToInsert(table, allColumnValues);           
         }
 
-        private Dictionary<string, List<string>> GenerateValues(CreateTableNode table, Dictionary<(string table, string column), List<string>> generatedIds)
+        private Dictionary<string, List<string>> GenerateValues(CreateTableNode table, Dictionary<string, Dictionary<string, List<string>>> generatedIds)
         {
             var columnValues = new Dictionary<string, List<string>>();
             var noForeignKeyColumns = table.Columns.Where(col => !HasConstraint(col, table, "FOREIGN KEY")).ToList();
@@ -36,7 +35,15 @@ namespace AutoSeeder.Services.Seed
                 var values = column.DataType.GenerateValue(true, RowCount);
                 if (HasConstraint(column, table, "PRIMARY"))
                 {
-                    generatedIds[(table: table.TableName, column: column.Name)] = values;
+                    if (!generatedIds.TryGetValue(table.TableName, out var tableIds))
+                    {
+                        tableIds = new Dictionary<string, List<string>>();
+                        generatedIds[table.TableName] = tableIds;
+                    }
+
+                    generatedIds[table.TableName].Add(column.Name, values);
+
+                    //generatedIds[(table: table.TableName, column: column.Name)] = values;
                     // I will change this to tuple and check it with benchmarkS
                 }
 
@@ -46,14 +53,15 @@ namespace AutoSeeder.Services.Seed
             return columnValues;
         }
 
-        private Dictionary<string, List<string>> GenerateForeignKeyValues(CreateTableNode table, Dictionary<(string table, string column), List<string>> generatedIds)
+        private Dictionary<string, List<string>> GenerateForeignKeyValues(CreateTableNode table, Dictionary<string, Dictionary<string, List<string>>> generatedIds)
         {
             var columnValues = new Dictionary<string, List<string>>();
 
             foreach (var fk in table.Constraints.Where(c => c.Type == "FOREIGN KEY"))
             {
                 // Map referenced columns to their generated IDs
-                var refIdGroups = fk.Columns.Select(col => generatedIds[(fk.ReferenceTable, col)]).ToList();
+                //var refIdGroups = fk.Columns.Select(col => generatedIds[(fk.ReferenceTable, col)]).ToList();
+                var refIdGroups = fk.Columns.Select(col => generatedIds[fk.ReferenceTable][col]).ToList();
 
                 // List of corresponding foreign key target columns
                 var fkColumns = fk.ReferenceColumns.ToList();

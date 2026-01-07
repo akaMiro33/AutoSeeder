@@ -15,9 +15,9 @@ namespace AutoSeeder.Services.Seed
         {
             var orderedTables = OrderByForeignKeys(tables);
             string sql;
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            var generatedIds = new Dictionary<(string table, string column), List<string>>();
+            var generatedIds = new Dictionary<string, Dictionary<string, List<string>>>();
 
             var insertGen = new InsertGenerator() { RowCount = 100 };
 
