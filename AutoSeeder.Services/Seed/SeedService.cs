@@ -1,15 +1,17 @@
 ﻿using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts;
+using AutoSeeder.ServiceContracts.Seed;
 using Microsoft.VisualBasic;
 using System;
 using System.Text;
 
 namespace AutoSeeder.Services.Seed
 {
-    public class SeedService
+    public class SeedService : ISeedService
     {
-        private readonly TableRepresentationService createTablesService;
-        private readonly SeedCreationService seedCreationService;
-        public SeedService(TableRepresentationService createTablesService, SeedCreationService seedCreationService)
+        private readonly ITableRepresentationService createTablesService;
+        private readonly ISeedCreationService seedCreationService;
+        public SeedService(ITableRepresentationService createTablesService, ISeedCreationService seedCreationService)
         {
             this.createTablesService = createTablesService;
             this.seedCreationService = seedCreationService;

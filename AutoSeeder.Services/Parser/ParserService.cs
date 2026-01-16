@@ -2,6 +2,8 @@
 using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Enums;
 using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts.Commo;
+using AutoSeeder.ServiceContracts.Parser;
 using AutoSeeder.Services.Common.ConstraintParsing;
 using AutoSeeder.Services.Datatypes;
 using System;
@@ -13,7 +15,12 @@ using System.Threading.Tasks;
 
 namespace AutoSeeder.Services.Parser
 {
-    public class ParserService
+    //public interface IParserService
+    //{
+    //    IReadOnlyList<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory);
+    //}
+
+    public class ParserService : IParserService
     {
         public IReadOnlyList<CreateTableNode> ParseTokens(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory)
         {

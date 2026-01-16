@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace AutoSeeder.Data.Common.DataTypeFactory
 {
-    public interface IDataTypeFactory
-    {
-        public IDataType Create(TokenStream tokens);
-    }
+    //public interface IDataTypeFactory
+    //{
+    //    public IDataType Create(TokenStream tokens);
+    //}
 }

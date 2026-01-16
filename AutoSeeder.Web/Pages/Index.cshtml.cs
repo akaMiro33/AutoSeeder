@@ -1,20 +1,41 @@
+using AutoSeeder.ServiceContracts.Seed;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AutoSeeder.Web.Pages
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
-    {
-        private readonly ILogger<IndexModel> _logger;
+    private readonly ISeedService _seedService;
 
-        public IndexModel(ILogger<IndexModel> logger)
+    public IndexModel(ISeedService seedService)
+    {
+        _seedService = seedService;
+    }
+
+    [BindProperty]
+    public string SchemaText { get; set; } = string.Empty;
+
+    public string SeedSql { get; private set; } = string.Empty;
+
+    public void OnGet()
+    {
+        // empty page
+    }
+
+    public void OnPost()
+    {
+        if (string.IsNullOrWhiteSpace(SchemaText))
         {
-            _logger = logger;
+            SeedSql = "-- Schema is empty";
+            return;
         }
 
-        public void OnGet()
+        try
         {
-
+            SeedSql = _seedService.Create(SchemaText);
+        }
+        catch (Exception ex)
+        {
+            SeedSql = $"-- Error:\n-- {ex.Message}";
         }
     }
 }

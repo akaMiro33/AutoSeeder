@@ -2,6 +2,9 @@
 using AutoSeeder.Data.Common.DataTypeFactory;
 using AutoSeeder.Data.Enums;
 using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts;
+using AutoSeeder.ServiceContracts.Commo;
+using AutoSeeder.ServiceContracts.Parser;
 using AutoSeeder.Services.Common.ConstraintParsing;
 using AutoSeeder.Services.Parser;
 using AutoSeeder.Services.Tokenization;
@@ -9,16 +12,16 @@ using AutoSeeder.Services.Tokenization;
 
 namespace AutoSeeder.Services
 {
-    public class TableRepresentationService
+    public class TableRepresentationService : ITableRepresentationService
     {
-        private readonly ParserService parserService;
+        private readonly IParserService parserService;
         private readonly List<IColumnConstraintParser> parsers;
         private readonly IDataTypeFactory dataTypeFactory;
 
-        public TableRepresentationService(ParserService parserService, List<IColumnConstraintParser> parsers, IDataTypeFactory dataTypeFactory)
+        public TableRepresentationService(IParserService parserService, IEnumerable<IColumnConstraintParser> parsers, IDataTypeFactory dataTypeFactory)
         {
             this.parserService = parserService;
-            this.parsers = parsers;
+            this.parsers = parsers.ToList();
             this.dataTypeFactory = dataTypeFactory;
         }
 

@@ -2,6 +2,8 @@
 using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Enums;
 using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts.Commo;
+using AutoSeeder.ServiceContracts.Parser;
 using AutoSeeder.Services.Common.ConstraintParsing;
 using AutoSeeder.Services.Datatypes;
 using System;
@@ -13,13 +15,22 @@ using System.Xml.Linq;
 
 namespace AutoSeeder.Services.Parser
 {
-    public sealed class ParserContext
+    //public interface IParserContext
+    //{
+    //    (ColumnNode Column, List<ConstraintNode> Constraints) ParseColumn();
+    //    List<string> ParseIdentifierList();
+    //    CreateTableNode ParseNode();
+    //    string ParseTableName();
+    //    IReadOnlyList<CreateTableNode> ParseTokens();
+    //}
+
+    public sealed class ParserContext : IParserContext
     {
         private readonly TokenStream _tokens;
         private readonly IReadOnlyList<IColumnConstraintParser> _constraintParsers;
         private readonly IDataTypeFactory _dataTypeFactory;
 
-        public ParserContext(IReadOnlyList<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory)
+        public ParserContext(IEnumerable<Token> tokens, IEnumerable<IColumnConstraintParser> constraintParsers, IDataTypeFactory dataTypeFactory)
         {
             _tokens = new TokenStream(tokens);
             _constraintParsers = constraintParsers.ToList();
@@ -88,7 +99,7 @@ namespace AutoSeeder.Services.Parser
         private ConstraintNode ParseTableConstraint()
         {
             var constraint = new ConstraintNode();
-            
+
             if (_tokens.Peek().Value.Equals("CONSTRAINT", StringComparison.OrdinalIgnoreCase))
             {
                 _tokens.Expect(TokenType.Keyword, "CONSTRAINT");

@@ -1,5 +1,6 @@
 ﻿using AutoSeeder.Data.Common.Datatypes;
 using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts.Commo;
 using AutoSeeder.Services.Datatypes;
 using AutoSeeder.Services.Parser;
 using System;

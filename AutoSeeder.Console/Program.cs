@@ -2,6 +2,10 @@
 
 //string tableSchema = "CREATE TABLE Persons (\r\n    PersonID int,\r\n    LastName varchar(255),\r\n    FirstName varchar(255),\r\n    Address varchar(255),\r\n    City varchar(255)\r\n);";
 using AutoSeeder.Data.Common.DataTypeFactory;
+using AutoSeeder.ServiceContracts;
+using AutoSeeder.ServiceContracts.Commo;
+using AutoSeeder.ServiceContracts.Parser;
+using AutoSeeder.ServiceContracts.Seed;
 using AutoSeeder.Services;
 using AutoSeeder.Services.Common.ConstraintParsing;
 using AutoSeeder.Services.Parser;
@@ -212,10 +216,10 @@ var parsers = new List<IColumnConstraintParser>()
 };
 
 IDataTypeFactory dataTypeFactory = new SqlTypeFactory();
-var parserService = new ParserService();
-var seedingCreationService = new SeedCreationService();
-var createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory);
-var seedService = new SeedService(createTablesService, seedingCreationService);
+IParserService parserService = new ParserService();
+ISeedCreationService seedingCreationService = new SeedCreationService();
+ITableRepresentationService createTablesService = new TableRepresentationService(parserService, parsers, dataTypeFactory);
+ISeedService seedService = new SeedService(createTablesService, seedingCreationService);
 seedService.Create(inputTableSchema);
 
 // to-do - composite primary keys and foreign keys

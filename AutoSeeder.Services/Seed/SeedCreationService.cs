@@ -1,4 +1,5 @@
 ﻿using AutoSeeder.Data.Models;
+using AutoSeeder.ServiceContracts.Seed;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AutoSeeder.Services.Seed
 {
-    public class SeedCreationService
+    public class SeedCreationService : ISeedCreationService
     {
         public string GenerateSeedSql(IReadOnlyList<CreateTableNode> tables)
         {

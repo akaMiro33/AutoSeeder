@@ -1,10 +1,28 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Auto Seeder";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Auto Seeder</h1>
+
+<form method="post">
+    <div>
+        <label for="schema">Table schema</label><br />
+        <textarea id="schema"
+                  name="SchemaText"
+                  rows="12"
+                  cols="100">@Model.SchemaText</textarea>
+    </div>
+
+    <br />
+
+    <button type="submit">Generate seed</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.SeedSql))
+{
+    <hr />
+    <h2>Generated seed</h2>
+    <pre>@Model.SeedSql</pre>
+}
