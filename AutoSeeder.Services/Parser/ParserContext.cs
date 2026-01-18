@@ -43,6 +43,12 @@ namespace AutoSeeder.Services.Parser
 
             while (_tokens.Peek() != null)
             {
+                if (_tokens.Peek().Value.Equals("ALTER", StringComparison.OrdinalIgnoreCase))
+                {
+                    ParseAlterTable(nodes);
+                    continue;
+                }
+
                 nodes.Add(ParseNode());
             }
 
@@ -94,6 +100,39 @@ namespace AutoSeeder.Services.Parser
                 _tokens.Consume();
 
             return table;
+        }
+
+        private void ParseAlterTable(List<CreateTableNode> tables)
+        {
+            _tokens.Consume(); // ALTER
+
+            //Expect(tokens, "TABLE");
+            _tokens.Expect(TokenType.Keyword, "TABLE");
+
+            var tableName = _tokens.Consume().Value;
+            var tableNode = tables.FirstOrDefault(x => x.TableName == tableName);
+
+            if (tableNode == null)
+            {
+                throw new Exception("Alter table: Table was not found");
+            }
+
+            var next = _tokens.Peek();
+            if (next.Value.Equals("ADD", StringComparison.OrdinalIgnoreCase))
+            {
+                ParseAlterTableAdd(tableNode);
+                if (_tokens.Peek()?.Value == ";")
+                    _tokens.Consume();
+                return;
+            }
+
+            throw new NotSupportedException("Only ALTER TABLE ADD is supported.");
+        }
+
+        private void ParseAlterTableAdd(CreateTableNode table)
+        {
+            _tokens.Consume(); // ADD
+            table.Constraints.Add(ParseTableConstraint());
         }
 
         private ConstraintNode ParseTableConstraint()

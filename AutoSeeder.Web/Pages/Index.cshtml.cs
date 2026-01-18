@@ -29,6 +29,8 @@ public class IndexModel : PageModel
             return;
         }
 
+        //  so far can't work with IDENTITY e.g (IDENTITY(1,1))
+
         try
         {
             SeedSql = _seedService.Create(SchemaText);

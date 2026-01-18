@@ -11,7 +11,7 @@ namespace AutoSeeder.Services.Tokenization
     public static class SqlTokenizer
     {
         private static readonly HashSet<char> Symbols = ['(', ')', ',', ';', '.'];
-        private static readonly HashSet<string> Keywords = ["CREATE", "TABLE", "PRIMARY", "KEY", "FOREIGN", "REFERENCES", "NOT", "NULL", "DEFAULT", "CHECK", "UNIQUE", "CONSTRAINT", "IDENTITY"];
+        private static readonly HashSet<string> Keywords = ["CREATE", "TABLE", "PRIMARY", "KEY", "FOREIGN", "REFERENCES", "NOT", "NULL", "DEFAULT", "CHECK", "UNIQUE", "CONSTRAINT", "IDENTITY", "ALTER"];
         private static readonly HashSet<string> IngoredKeywords = ["ON", "NO", "DELETE", "CASCADE", "UPDATE", "ACTION", "CLUSTERED", "NONCLUSTERED", "SET", "CHECK"];
 
         public static List<Token> GetTokens(string input)
