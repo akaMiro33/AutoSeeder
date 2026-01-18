@@ -15,15 +15,6 @@ using System.Xml.Linq;
 
 namespace AutoSeeder.Services.Parser
 {
-    //public interface IParserContext
-    //{
-    //    (ColumnNode Column, List<ConstraintNode> Constraints) ParseColumn();
-    //    List<string> ParseIdentifierList();
-    //    CreateTableNode ParseNode();
-    //    string ParseTableName();
-    //    IReadOnlyList<CreateTableNode> ParseTokens();
-    //}
-
     public sealed class ParserContext : IParserContext
     {
         private readonly TokenStream _tokens;
@@ -45,7 +36,16 @@ namespace AutoSeeder.Services.Parser
             {
                 if (_tokens.Peek().Value.Equals("ALTER", StringComparison.OrdinalIgnoreCase))
                 {
-                    ParseAlterTable(nodes);
+                    var alterTableNode = ParseAlterTable();
+                    var tableNode = nodes.FirstOrDefault(x => x.TableName == alterTableNode.TableName);
+
+                    if (tableNode == null)
+                    {
+                        throw new InvalidOperationException($"ALTER TABLE failed: table '{alterTableNode.TableName}' was not found in parsed script.");
+                    }
+
+                    tableNode.Constraints.Add(alterTableNode.Constraint);
+
                     continue;
                 }
 
@@ -102,7 +102,7 @@ namespace AutoSeeder.Services.Parser
             return table;
         }
 
-        private void ParseAlterTable(List<CreateTableNode> tables)
+        private ConstraintNodeWithTableName ParseAlterTable()
         {
             _tokens.Consume(); // ALTER
 
@@ -110,29 +110,28 @@ namespace AutoSeeder.Services.Parser
             _tokens.Expect(TokenType.Keyword, "TABLE");
 
             var tableName = _tokens.Consume().Value;
-            var tableNode = tables.FirstOrDefault(x => x.TableName == tableName);
-
-            if (tableNode == null)
-            {
-                throw new Exception("Alter table: Table was not found");
-            }
 
             var next = _tokens.Peek();
             if (next.Value.Equals("ADD", StringComparison.OrdinalIgnoreCase))
             {
-                ParseAlterTableAdd(tableNode);
+                _tokens.Consume();
+
+                var constraint = ParseTableConstraint();
+                var constraintWithTableName = new ConstraintNodeWithTableName()
+                {
+                    TableName = tableName,
+                    Constraint = constraint
+                };
+
                 if (_tokens.Peek()?.Value == ";")
+                {
                     _tokens.Consume();
-                return;
+                }
+
+                return constraintWithTableName;
             }
 
             throw new NotSupportedException("Only ALTER TABLE ADD is supported.");
-        }
-
-        private void ParseAlterTableAdd(CreateTableNode table)
-        {
-            _tokens.Consume(); // ADD
-            table.Constraints.Add(ParseTableConstraint());
         }
 
         private ConstraintNode ParseTableConstraint()

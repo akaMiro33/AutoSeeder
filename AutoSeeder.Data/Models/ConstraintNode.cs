@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace AutoSeeder.Data.Models
 {
+
+    public class ConstraintNodeWithTableName
+    {
+        public string TableName { get; set; }
+        public ConstraintNode Constraint { get; set; }
+    }
+
     public class ConstraintNode
     {
         public string Type { get; set; } // PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, etc.
