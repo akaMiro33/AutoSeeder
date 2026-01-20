@@ -115,6 +115,25 @@ namespace AutoSeeder.Services.Seed
                 rows.Add($"({string.Join(", ", row)})");
             }
 
+            //if (table.Constraints.Any(c => c.Type.StartsWith("IDENTITY")))
+            //{
+            //    var identityColumn = table.Columns.FirstOrDefault(col => HasConstraint(col, table, "IDENTITY"));
+
+            //    if (identityColumn is null)
+            //    {
+            //        throw new Exception(" bla bla este neviem čo");
+            //    }
+
+            //    return
+            //        $"DECLARE @{table.TableName} TABLE ( {identityColumn.Name} INT) " +
+            //        //$"DECLARE @{table.TableName} TABLE({identityColumn.Name} {identityColumn.DataType})" +
+            //        $"INSERT INTO {table.TableName} " +
+            //        $"({string.Join(", ", columns)}) " +
+            //        $"OUTPUT INSERTED.{identityColumn.Name} INTO @{table.TableName} " +
+            //        $"VALUES {string.Join(", ", rows)};";
+            //}
+
+
             return
                 $"INSERT INTO {table.TableName} " +
                 $"({string.Join(", ", columns)}) VALUES " +
